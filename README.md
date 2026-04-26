@@ -66,7 +66,7 @@ pip install -r dagster_weather/requirements.txt
 ### Lancement du pipeline
 ```bash
 # Navigation vers le projet
-cd "C:\Users\T441\Desktop\Data Engineering\Project\Meteo Project"
+cd "votre directory_path_to\Meteo Project"
 
 # Exécution des assets Dagster
 dagster asset materialize --select raw_weather_data,load_weather_to_duckdb
