@@ -59,7 +59,7 @@ def daily_weather_with_context(context: ScheduleEvaluationContext) -> RunRequest
     
     run_config = {
         "ops": {
-            "extract_weather_data": {
+            "raw_weather_data": {
                 "config": {
                     "execution_date": date_str,
                     "batch_id": f"weather_{date_str}",
