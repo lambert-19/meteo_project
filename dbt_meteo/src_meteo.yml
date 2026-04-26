@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: meteo_raw
+    database: meteo_weather
+    schema: main
+    tables:
+      - name: fct_weather_history
+        description: "Données météo brutes chargées depuis les fichiers CSV"
+      - name: dim_cities
+        description: "Référentiel des villes configurées"
+      - name: dim_calendar
+        description: "Dimension temporelle"

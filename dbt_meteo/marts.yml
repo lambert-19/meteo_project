@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: mart_city_heatwaves
+    description: |
+      Ce modèle identifie les épisodes de vagues de chaleur par ville.
+      Un épisode est défini comme une séquence de jours consécutifs où la température maximale
+      dépasse un certain seuil.
+      
+      **Paramètres de configuration (vars) :**
+      - `heatwave_temp_threshold` : Seuil actuel de {{ var('heatwave_temp_threshold') }}°C.
+      - `heatwave_min_duration` : Durée minimale de {{ var('heatwave_min_duration') }} jours.
+    columns:
+      - name: city_name
+        description: "Nom de la ville observée."
+        tests:
+          - not_null
+      - name: duration_days
+        description: "Nombre de jours consécutifs de l'épisode."
+        tests:
+          - accepted_values:
+              values: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+              quote: false
+      - name: avg_temp_max
+        description: "Température maximale moyenne enregistrée pendant la vague de chaleur."

@@ -22,6 +22,15 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Définition des variables globales du projet
+vars:
+  # Seuil de température maximale (en °C) pour définir un jour comme "chaud".
+  # Utilisé dans la macro get_heatwave_events.
+  heatwave_temp_threshold: 30
+  
+  # Nombre minimum de jours consécutifs au-dessus du seuil pour qualifier une vague de chaleur.
+  # Valeur par défaut recommandée par les standards climatiques : 3.
+  heatwave_min_duration: 3
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
