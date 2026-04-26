@@ -1,0 +1,8 @@
+dbt_meteo:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # Connexion à MotherDuck
+      path: "md:meteo_weather"
+      threads: 1

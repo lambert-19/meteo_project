@@ -1,8 +1,8 @@
 # 🐛 TROUBLESHOOTING - Meteo Project
 
-## 📋 Erreurs rencontrées et solutions
+## 📋 Erreurs d'Orchestration (Dagster)
 
-### 🔧 1. Problèmes d'importation Python
+### 🔧 1. DagsterUnknownPartitionError
 
 #### ❌ Erreur
 ```
@@ -151,6 +151,27 @@ Convertir les types de données non supportés en strings :
 
 # Nouvelle approche
 "date": str(df['date'].iloc[0])  # String supportée
+```
+
+---
+
+### 🔧 9. Erreurs Pylance : "(" was not closed
+
+#### ❌ Erreur
+```
+message: "(" was not closed (Pylance)
+```
+Généralement signalé sur la ligne `return SensorResult(`.
+
+#### ✅ Solution
+Il s'agit d'un problème d'indentation des arguments à l'intérieur de la fonction. En Python, les arguments d'une fonction multi-ligne doivent être alignés. Si l'argument `cursor` est aligné avec le mot-clé `return` au lieu d'être indenté à l'intérieur des parenthèses, Pylance lève une erreur de syntaxe.
+
+**Correction :**
+```python
+return SensorResult(
+    run_requests=[...],
+    cursor=str(...) # S'assurer que 'cursor' est bien aligné sous 'run_requests'
+)
 ```
 
 ---

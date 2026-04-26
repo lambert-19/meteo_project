@@ -136,7 +136,7 @@ def api_rate_limit_sensor(context: SensorEvaluationContext):
                         partition_key=partition_key
                     )
                 ],
-            cursor=str(current_time.timestamp())
+                cursor=str(current_time.timestamp())
             )
     
     return SensorResult(cursor=str(last_run_time))
@@ -267,7 +267,7 @@ def manual_trigger_sensor(context: SensorEvaluationContext):
                     partition_key=partition_key
                     )
                 ],
-            cursor=str(current_time.timestamp())
+                cursor=str(current_time.timestamp())
             )
     
     return SensorResult(cursor=str(last_trigger_check))
