@@ -96,8 +96,8 @@ Marseille,2026-04-18,16.5,14.0,19.0,68,1018,nuageux,4.2
 
 ### Variables d'environnement
 ```bash
-API_KEY=votre_cle_openweathermap
 MOTHERDUCK_TOKEN=votre_token_motherduck
+PYTHONLEGACYWINDOWSSTDIO=1
 ```
 
 ### Fichiers de configuration

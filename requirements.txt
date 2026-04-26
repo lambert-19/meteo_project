@@ -1,0 +1,12 @@
+dagster>=1.8.0
+dagster-webserver>=1.8.0
+pandas
+requests
+duckdb
+python-dotenv
+pydantic>=2.0.0
+tabulate
+pytest
+dbt-core
+dbt-duckdb
+dagster-dbt

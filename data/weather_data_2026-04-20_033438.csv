@@ -1,0 +1,4 @@
+city,latitude,longitude,elevation,region,date,temperature,temp_min,temp_max,precipitation_sum,weather_description,wind_speed,extracted_at
+Paris,48.8566,2.3522,35,Île-de-France,2026-04-20,11.0,6.2,15.8,0.0,Couvert,0,2026-04-26 03:34:34.848858
+Lyon,45.764,4.8357,173,Auvergne-Rhône-Alpes,2026-04-20,12.899999999999999,7.1,18.7,0.0,Couvert,0,2026-04-26 03:34:36.267681
+Marseille,43.2965,5.3698,12,Provence-Alpes-Côte d'Azur,2026-04-20,18.5,14.1,22.9,0.0,Couvert,0,2026-04-26 03:34:38.229057
