@@ -1,6 +1,7 @@
 """Dagster jobs and schedules for weather data pipeline."""
 
 from typing import Any, List
+from datetime import timedelta
 from dagster import (
     schedule,  # type: ignore
     ScheduleDefinition,
@@ -18,15 +19,22 @@ weather_job: Any = define_asset_job(
     selection=AssetSelection.all(), # Select all assets
 )
 
-# Daily schedule for weather data extraction (every day at 9 AM)
-daily_weather_schedule = ScheduleDefinition(
+@schedule(
     job=weather_job,
-    cron_schedule="0 9 * * *",  # Every day at 9:00 AM
-    description="Weather data extraction and loading (daily at 9:00 AM)",
+    cron_schedule="0 9 * * *",
+    description="Extraction quotidienne avec un délai de 5 jours pour l'API Archive",
+    execution_timezone="Europe/Paris",
     default_status=DefaultScheduleStatus.RUNNING,
-    execution_timezone="Europe/Paris"
 )
-
+def daily_weather_schedule(context: ScheduleEvaluationContext) -> RunRequest:
+    """Génère une exécution pour la partition située 5 jours avant la date actuelle."""
+    scheduled_date = context.scheduled_execution_time
+    target_date = (scheduled_date - timedelta(days=5)).strftime("%Y-%m-%d")
+    
+    return RunRequest(
+        partition_key=target_date,
+        run_key=f"daily_weather_delayed_{target_date}"
+    )
 
 # Hourly schedule for testing (optional)
 hourly_weather_schedule = ScheduleDefinition(
@@ -84,8 +92,7 @@ def daily_weather_with_context(context: ScheduleEvaluationContext) -> RunRequest
 
 # All schedules to be registered (simplified for testing)
 all_schedules: List[Any] = [
-    daily_weather_schedule,
-    daily_weather_with_context
+    daily_weather_schedule
 ]
 
 # All jobs to be registered

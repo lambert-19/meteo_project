@@ -4,11 +4,12 @@ from dagster import (
     sensor,  # type: ignore
     SensorEvaluationContext,
     SensorResult,
-    RunRequest
+    RunRequest,
+    DefaultSensorStatus
 )
 import os
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from .jobs import weather_job
 import re
 
@@ -16,6 +17,7 @@ import re
     job=weather_job,
     description="Trigger weather pipeline when new CSV files are detected",
     minimum_interval_seconds=120,  # Check every 2 minutes
+    default_status=DefaultSensorStatus.RUNNING
 )
 def csv_file_sensor(context: SensorEvaluationContext):
     """Sensor that triggers the weather pipeline when new CSV files are detected."""
@@ -23,6 +25,10 @@ def csv_file_sensor(context: SensorEvaluationContext):
     # Get the data directory
     data_dir = Path(__file__).resolve().parent.parent.parent / "data"
     
+    if not data_dir.exists():
+        context.log.warning(f"Data directory {data_dir} does not exist.")
+        return SensorResult(cursor=context.cursor)
+
     # Find all weather CSV files
     csv_files = [f for f in os.listdir(str(data_dir)) if f.startswith('weather_data_') and f.endswith('.csv')]
     
@@ -41,9 +47,9 @@ def csv_file_sensor(context: SensorEvaluationContext):
     # Check if we have a new file since last check
     last_seen_timestamp = float(context.cursor) if context.cursor else 0.0
     
-    if latest_file and latest_timestamp is not None and latest_timestamp > last_seen_timestamp:
+    if latest_file and latest_timestamp and latest_timestamp > last_seen_timestamp:
         # New file detected, trigger the pipeline
-        run_key = f"csv_trigger_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        run_key = f"csv_trigger_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
         
         # Extraire la date du nom de fichier (format: weather_data_YYYYMMDD_...)
         # Exemple: weather_data_20260426_021709.csv -> 2026-04-26
@@ -54,7 +60,7 @@ def csv_file_sensor(context: SensorEvaluationContext):
             # Fallback sur la date du jour - 5 (délai Archive API) si le nom ne correspond pas
             partition_key = datetime.fromtimestamp(latest_timestamp).strftime('%Y-%m-%d')
 
-        context.log.info(f"New CSV file detected: {latest_file}")
+        context.log.info(f"New CSV file detected: {latest_file}. Targeting job: weather_pipeline_job")
         context.log.info(f"Triggering weather pipeline with run key: {run_key}")
         
         return SensorResult(
@@ -84,12 +90,13 @@ def csv_file_sensor(context: SensorEvaluationContext):
 @sensor(
     job=weather_job,
     description="Trigger weather pipeline based on API rate limits and optimal timing",
-    minimum_interval_seconds=3600  # Check every hour
+    minimum_interval_seconds=3600,  # Check every hour
+    default_status=DefaultSensorStatus.RUNNING
 )
 def api_rate_limit_sensor(context: SensorEvaluationContext):
     """Sensor that triggers the pipeline based on API rate limits and optimal conditions."""
     
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     current_hour = current_time.hour
     
     # Define optimal hours for weather data extraction (avoiding peak API usage times)
@@ -138,6 +145,7 @@ def api_rate_limit_sensor(context: SensorEvaluationContext):
     job=weather_job,
     description="Trigger weather pipeline for specific cities based on weather conditions",
     minimum_interval_seconds=1800  # Check every 30 minutes
+    
 )
 def weather_condition_sensor(context: SensorEvaluationContext):
     """Sensor that triggers the pipeline when specific weather conditions are met."""
@@ -146,7 +154,7 @@ def weather_condition_sensor(context: SensorEvaluationContext):
     # In a real implementation, you might check external weather APIs
     # or other conditions that should trigger additional data collection
     
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     
     # Example: Trigger more frequently during severe weather events
     # This would require access to real-time weather alerts
@@ -192,7 +200,8 @@ def weather_condition_sensor(context: SensorEvaluationContext):
 @sensor(
     job=weather_job,
     description="Manual trigger sensor for ad-hoc weather data collection",
-    minimum_interval_seconds=60  # Check every minute
+    minimum_interval_seconds=60,  # Check every minute
+    default_status=DefaultSensorStatus.RUNNING
 )
 def manual_trigger_sensor(context: SensorEvaluationContext):
     """Sensor that checks for manual trigger requests (e.g., from a flag file)."""
@@ -204,7 +213,7 @@ def manual_trigger_sensor(context: SensorEvaluationContext):
     
     last_trigger_check = float(context.cursor) if context.cursor else 0.0
     
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     
     if os.path.exists(trigger_file):
         file_mtime = os.path.getmtime(trigger_file)
@@ -236,8 +245,8 @@ def manual_trigger_sensor(context: SensorEvaluationContext):
             try:
                 os.remove(trigger_file)
                 context.log.info("Removed trigger file")
-            except:
-                context.log.warning("Could not remove trigger file")
+            except OSError as e:
+                context.log.warning(f"Could not remove trigger file: {e}")
             
             return SensorResult(
                 run_requests=[

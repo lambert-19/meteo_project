@@ -25,11 +25,8 @@ from extract import WeatherExtractor
 from data import load_csv_to_duckdb
 
 # Définition d'une partition quotidienne
-# On ajoute un end_offset de -5 pour que la "dernière partition" disponible 
-# soit toujours celle d'il y a 5 jours, garantissant la disponibilité des données Archive API.
 daily_partition = DailyPartitionsDefinition(
-    start_date="2024-01-01",
-    end_offset=-5
+    start_date="2024-01-01"
 )
 
 @asset(

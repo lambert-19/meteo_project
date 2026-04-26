@@ -5,9 +5,9 @@ import pandas as pd
 import duckdb
 from dotenv import load_dotenv
 from datetime import datetime, date
-from typing import Dict, Any, cast
+from typing import Dict, Any, cast, Optional
 
-def load_csv_to_duckdb() -> Dict[str, Any]:
+def load_csv_to_duckdb(target_date: Optional[str] = None) -> Dict[str, Any]:
     """Load weather data from CSV files into DuckDB database."""
     
     print("Starting weather data loading to DuckDB...")
@@ -44,13 +44,20 @@ def load_csv_to_duckdb() -> Dict[str, Any]:
     
     # Find CSV files
     data_dir = os.path.join(project_root, 'data')
-    csv_files = [f for f in os.listdir(data_dir) if f.startswith('weather_data_') and f.endswith('.csv')]
+    
+    if target_date:
+        # Chercher les fichiers correspondant à la date de la partition (YYYY-MM-DD -> YYYYMMDD)
+        date_clean = target_date.replace('-', '')
+        csv_files = [f for f in os.listdir(data_dir) if f"weather_data_{date_clean}" in f and f.endswith('.csv')]
+    else:
+        csv_files = [f for f in os.listdir(data_dir) if f.startswith('weather_data_') and f.endswith('.csv')]
     
     if not csv_files:
-        print("No weather CSV files found!")
-        return {"warning": "No CSV files found"}
+        msg = f"No weather CSV files found for date: {target_date if target_date else 'any'}"
+        print(msg)
+        return {"warning": msg}
     
-    # Trier les fichiers par nom pour identifier le plus récent (basé sur le timestamp)
+    # Prendre le plus récent parmi ceux trouvés
     csv_files = sorted(csv_files)
     latest_file = csv_files[-1]
     
