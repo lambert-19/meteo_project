@@ -18,8 +18,7 @@ Ce projet implémente une pipeline de données de bout en bout permettant de com
 ```
 Meteo Project/
 ├── 📁 extract/                    # Extraction API météo
-│   ├── weather_extractor.py     # Classe WeatherExtractor
-│   ├── config.py              # Configuration API
+│   ├── weather_extractor.py     # Classe WeatherExtractor & Coordonnées villes
 │   └── __init__.py
 ├── 📁 data/                      # Données brutes
 │   ├── duckdb/               # Base MotherDuck
@@ -28,7 +27,8 @@ Meteo Project/
 │   ├── dagster_weather/
 │   │   ├── assets.py      # Assets Dagster ✅
 │   │   ├── definitions.py  # Définitions
-│   │   ├── config.py      # Configuration
+│   │   ├── config_jobs.py  # Configuration des Jobs et Schedules
+│   │   ├── run_configs.py  # Configurations d'exécution
 │   │   └── __init__.py
 │   └── requirements.txt
 ├── 📁 .env                       # Variables d'environnement
@@ -101,8 +101,8 @@ PYTHONLEGACYWINDOWSSTDIO=1
 ```
 
 ### Fichiers de configuration
-- **`extract/config.py`** : Villes, URLs API, jours historiques
-- **`dagster_weather/config.py`** : Configuration Dagster
+- **`extract/weather_extractor.py`** : Contient la liste des villes, leurs coordonnées GPS et les paramètres de l'API Open-Meteo.
+- **`dagster_weather/dagster_weather/config_jobs.py`** : Définit les paramètres des Jobs, des Schedules et les politiques de retry.
 
 ## 🐛 Dépannage et erreurs rencontrées
 
