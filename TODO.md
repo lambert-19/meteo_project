@@ -30,11 +30,11 @@ Ce document récapitule les étapes accomplies et les tâches restantes pour fin
 
 ## ⏳ Ce qu'il reste à faire (Tâches Prioritaires)
 
-### 1. Transformations avec dbt (Crucial pour la Roadmap)
-- [ ] **Staging Layer** : Créer les modèles SQL pour nettoyer les données brutes (`stg_weather_temperatures`, `stg_weather_precipitation`).
-- [ ] **Mart Layer** : Créer le modèle final `fct_weather_summary` pour l'analyse.
-- [ ] **Snapshots** : Configurer un snapshot dbt pour capturer l'évolution des prévisions quotidiennes (dossier `snapshots/`).
-- [ ] **Stratégie Incrémentale** : Configurer dbt pour ne traiter que les nouvelles données.
+### 1. Transformations avec dbt ✅
+- [x] **Staging Layer** : Modèle `stg_weather_history` (typage, renommage).
+- [x] **Mart Layer** : Records par ville, vagues de chaleur, amplitude thermique.
+- [x] **Macros** : Logique Gaps and Islands pour les événements consécutifs.
+- [ ] **Tests dbt** : Ajouter `unique` et `not_null` dans les fichiers YAML.
 
 ### 2. Tests et Qualité (Validation)
 - [ ] **Tests Unitaires (pytest)** : Créer des tests pour valider `weather_extractor.py` (vérifier que `temp_max > temp_min`).
@@ -55,4 +55,3 @@ Ce document récapitule les étapes accomplies et les tâches restantes pour fin
 
 ## 🚀 Prochaine action immédiate
 **Lancer le `setup_duckdb.py`** pour mettre à jour les tables avec les nouveaux champs (Régions, Altitude) puis effectuer un **Backfill** de 30 jours via l'interface Dagster pour peupler la base de données.
-

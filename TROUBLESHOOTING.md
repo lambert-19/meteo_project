@@ -2,7 +2,7 @@
 
 ## 📋 Erreurs d'Orchestration (Dagster)
 
-### 🔧 1. DagsterUnknownPartitionError
+### 🔧 1. Importation du module extract
 
 #### ❌ Erreur
 ```
@@ -173,6 +173,20 @@ return SensorResult(
     cursor=str(...) # S'assurer que 'cursor' est bien aligné sous 'run_requests'
 )
 ```
+
+---
+
+### 🔧 10. dbt docs serve : Erreurs 404 "getIcon"
+
+#### ❌ Erreur
+```
+127.0.0.1 - - "GET /%7B%7B%20getIcon(item.type,%20'on')%20%7D%7D HTTP/1.1" 404 -
+```
+
+#### ✅ Solution
+Il s'agit d'un problème cosmétique connu dans l'interface utilisateur de dbt docs lié au rendu des icônes. 
+
+**Impact :** Aucun. Votre documentation et votre graphe de lignage restent parfaitement fonctionnels. Vous pouvez ignorer ces messages dans la console.
 
 ---
 

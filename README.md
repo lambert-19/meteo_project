@@ -2,13 +2,13 @@
 
 ## 📋 Vue d'ensemble
 
-Ce projet implémente une pipeline de données de bout en bout permettant de comparer les températures (max/min) et les précipitations de trois villes françaises (**Paris, Lyon, Marseille**). L'objectif est de faciliter l'analyse des tendances climatiques locales via un processus ELT (Extract, Load, Transform) robuste et orchestré.
+Ce projet implémente une pipeline de données ELT complète permettant d'analyser et de comparer les climats de **Paris, Lyon, et Marseille**. L'architecture repose sur l'extraction des données via l'API **Open-Meteo Archive**, le stockage dans **DuckDB** (via MotherDuck) et la transformation analytique avec **dbt**.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   🌤️ METEO PROJECT                    │
 │                                                         │
-│  🌍 Extraction → 🦆 Loading → 📊 Analytics     │
+│  🌍 API -> 🐍 Python -> 🦆 DuckDB -> 📊 dbt -> 📈 Insights   │
 │                                                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -79,10 +79,10 @@ dagster dev
 
 ### Structure des fichiers CSV
 ```csv
-city,date,temperature,temp_min,temp_max,humidity,pressure,weather_description,wind_speed
-Paris,2026-04-18,15.2,12.1,18.5,65,1015,nuageux léger,3.5
-Lyon,2026-04-18,13.8,10.2,17.4,72,1012,partiellement nuageux,2.8
-Marseille,2026-04-18,16.5,14.0,19.0,68,1018,nuageux,4.2
+ city,latitude,longitude,elevation,region,date,temperature,temp_min,temp_max,precipitation_sum,weather_description
+Paris,48.8566,2.3522,35,Île-de-France,2026-04-18,15.2,12.1,18.5,0.0,Ciel dégagé
+Lyon,45.764,4.8357,173,Auvergne-Rhône-Alpes,2026-04-18,13.8,10.2,17.4,2.5,Pluie légère
+Marseille,43.2965,5.3698,12,Provence-Alpes-Côte d'Azur,2026-04-18,16.5,14.0,19.0,0.0,Ciel dégagé
 ```
 
 ### Métadonnées Dagster

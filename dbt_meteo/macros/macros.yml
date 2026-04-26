@@ -1,0 +1,10 @@
+version: 2
+
+macros:
+  - name: get_heatwave_events
+    description: "Macro implémentant la logique 'Gaps and Islands' pour identifier des séquences consécutives de jours chauds."
+    arguments:
+      - name: source_model
+        description: "Le modèle dbt de référence contenant les températures."
+      - name: temp_threshold
+        description: "Le seuil de température (défini via var: heatwave_temp_threshold)."

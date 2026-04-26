@@ -23,3 +23,21 @@ models:
               quote: false
       - name: avg_temp_max
         description: "Température maximale moyenne enregistrée pendant la vague de chaleur."
+
+  - name: mart_city_frost_days
+    description: "Analyse des jours de gel (temp_min < 0°C) par ville."
+    columns:
+      - name: frost_days_count
+        description: "Nombre total de jours de gel sur la période."
+
+  - name: mart_city_thermal_amplitude
+    description: "Calcul de l'écart entre les températures minimales et maximales par ville."
+    columns:
+      - name: avg_thermal_amplitude
+        description: "Moyenne de l'amplitude thermique journalière."
+
+  - name: mart_regional_precipitation_comparison
+    description: "Comparaison des précipitations cumulées et moyennes par région géographique."
+    columns:
+      - name: pct_of_total_precipitation
+        description: "Part relative de la région dans le total des précipitations du projet."
