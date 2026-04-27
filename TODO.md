@@ -34,11 +34,11 @@ Ce document récapitule les étapes accomplies et les tâches restantes pour fin
 - [x] **Staging Layer** : Modèle `stg_weather_history` (typage, renommage).
 - [x] **Mart Layer** : Records par ville, vagues de chaleur, amplitude thermique.
 - [x] **Macros** : Logique Gaps and Islands pour les événements consécutifs.
-- [ ] **Tests dbt** : Ajouter `unique` et `not_null` dans les fichiers YAML.
+- [x] **Orchestration** : Intégration de dbt dans Dagster via `dagster-dbt`.
 
 ### 2. Tests et Qualité (Validation)
 - [ ] **Tests Unitaires (pytest)** : Créer des tests pour valider `weather_extractor.py` (vérifier que `temp_max > temp_min`).
-- [ ] **Tests dbt** : Ajouter des tests de cohérence sur les colonnes DuckDB (`not_null`, `unique` sur les IDs).
+- [x] **Tests dbt** : Validation de la jointure snapshot et contraintes de base (`not_null`, `unique`).
 - [ ] **Validation Pydantic** : Renforcer la validation du JSON reçu de l'API.
 
 ### 3. Visualisation et Aide à la Décision

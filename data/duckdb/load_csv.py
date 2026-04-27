@@ -97,7 +97,7 @@ def load_csv_to_duckdb(target_date: Optional[str] = None) -> Dict[str, Any]:
                 date_obj: date = cast(Any, pd.to_datetime(date_str)).date()
                 date_id = int(date_obj.strftime("%Y%m%d"))
                 
-                # INSERT with exactly 11 columns and 11 values
+                # INSERT with exactly 13 columns and 13 values
                 conn.execute("""
                     INSERT INTO meteo_weather.main.fct_weather_history 
                     (weather_id, city_id, date_id, timestamp, temperature, temp_min, temp_max, precipitation_sum,

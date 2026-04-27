@@ -16,6 +16,10 @@ with source as (
     from {{ source('meteo_raw', 'fct_weather_history') }}
 ),
 
+cities_snapshot as (
+    select * from {{ ref('snp_cities') }}
+),
+
 cleaned as (
     select
         weather_id,
@@ -34,11 +38,27 @@ cleaned as (
         cast(wind_speed as float) as wind_speed_ms,
         cast(extracted_at as timestamp) as loaded_at
     from source
+),
+
+joined as (
+    select
+        w.*,
+        c.city_name,
+        c.region,
+        c.elevation
+    from cleaned w
+    left join cities_snapshot c
+        on w.city_id = c.city_id
+        and w.observed_at >= c.dbt_valid_from
+        and w.observed_at < coalesce(c.dbt_valid_to, cast('9999-12-31' as timestamp))
 )
 
 select
     weather_id,
     city_id,
+    city_name,
+    region,
+    elevation,
     date_id,
     observed_at,
     temperature_avg,
@@ -50,4 +70,4 @@ select
     weather_condition,
     wind_speed_ms,
     loaded_at
-from cleaned
+from joined

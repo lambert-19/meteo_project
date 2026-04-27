@@ -50,7 +50,7 @@ Meteo Project/
 - **Validation** : Vérification des données avant chargement
 
 ### ✅ Orchestration Dagster
-- Assets : `raw_weather_data` → `load_weather_to_duckdb`
+- Assets : `raw_weather_data` → `load_weather_to_duckdb` → `dbt_meteo_assets` (Staging & Marts)
 - **Dépendances** : Liaison automatique entre assets
 - **Monitoring** : Logs détaillés et métadonnées
 - **Exécution parallèle** : Support du multiprocess
@@ -69,7 +69,7 @@ pip install -r dagster_weather/requirements.txt
 cd "votre directory_path_to\Meteo Project"
 
 # Exécution des assets Dagster
-dagster asset materialize --select raw_weather_data,load_weather_to_duckdb
+dagster asset materialize --select raw_weather_data,load_weather_to_duckdb,dbt_meteo_assets
 
 # Lancement UI Dagster (quand disponible)
 dagster dev

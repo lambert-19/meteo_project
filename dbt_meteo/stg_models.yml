@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_weather_history
+    description: "Modèle de staging nettoyant les données brutes : renommage, typage et gestion des valeurs nulles."
+    columns:
+      - name: weather_id
+        description: "Clé primaire technique de l'observation."
+        tests:
+          - unique
+          - not_null
+      - name: city_name
+        description: "Nom de la ville récupéré via le snapshot snp_cities (SCD Type 2)."
+        tests:
+          - not_null
+      - name: observed_at
+        description: "Date et heure de l'observation météo convertie en timestamp."
+      - name: temperature_avg
+        description: "Moyenne calculée entre temp_min et temp_max."
+      - name: precipitation_mm
+        description: "Cumul des précipitations avec remplacement des NULL par 0."

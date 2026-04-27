@@ -5,7 +5,9 @@ from dagster import (
     SensorEvaluationContext,
     SensorResult,
     RunRequest,
-    DefaultSensorStatus
+    DefaultSensorStatus,
+    run_failure_sensor,  # type: ignore
+    RunFailureSensorContext
 )
 import os
 from pathlib import Path
@@ -272,10 +274,25 @@ def manual_trigger_sensor(context: SensorEvaluationContext):
     
     return SensorResult(cursor=str(last_trigger_check))
 
+@run_failure_sensor(
+    name="weather_pipeline_failure_sensor",
+    job_selection=[weather_job],
+    default_status=DefaultSensorStatus.RUNNING
+)
+def weather_pipeline_failure_sensor(context: RunFailureSensorContext):
+    """Alerte déclenchée en cas d'échec du job (incluant les tests dbt via dbt build)."""
+    job_name = context.dagster_run.job_name
+    run_id = context.dagster_run.run_id
+    error_msg = context.failure_event.message
+    
+    # Ici, vous pouvez intégrer un client Slack, Email ou MS Teams
+    context.log.error(f"🚨 ALERTE MÉTÉO : Échec du Job {job_name} (Run: {run_id}). Erreur : {error_msg}")
+
 # All sensors to be registered
 all_sensors = [
     csv_file_sensor,
     api_rate_limit_sensor,
     weather_condition_sensor,
-    manual_trigger_sensor
+    manual_trigger_sensor,
+    weather_pipeline_failure_sensor
 ]
