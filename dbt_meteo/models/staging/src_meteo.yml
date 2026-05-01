@@ -1,8 +1,6 @@
 version: 2
-
 sources:
   - name: meteo_raw
-    database: meteo_weather
     schema: main
     tables:
       - name: fct_weather_history

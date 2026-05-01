@@ -1,8 +1,6 @@
 {% snapshot snp_cities %}
-
 {{
     config(
-      target_database='meteo_weather',
       target_schema='main',
       unique_key='city_id',
       strategy='check',
@@ -10,7 +8,6 @@
       invalidate_hard_deletes=True,
     )
 }}
-
 select 
     city_id,
     city_name,

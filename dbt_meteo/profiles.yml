@@ -3,6 +3,5 @@ dbt_meteo:
   outputs:
     dev:
       type: duckdb
-      # Connexion à MotherDuck
-      path: "md:meteo_weather"
+      path: "../data/meteo.duckdb"
       threads: 1

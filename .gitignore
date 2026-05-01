@@ -1,0 +1,7 @@
+.tmp_dagster_home_*
+data/*.csv
+data/*.duckdb
+dbt_meteo/target/
+venv/
+__pycache__/
+*.pyc
