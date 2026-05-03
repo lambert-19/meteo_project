@@ -1,28 +1,22 @@
-version: '3.8'
-
 services:
   dagster:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     container_name: meteo_dagster_app
     ports:
       - "3000:3000"
     environment:
       - DAGSTER_HOME=/opt/dagster/dagster_home
-      # Chemin vers la base DuckDB à l'intérieur du conteneur
       - METEO_DATABASE_PATH=/app/data/meteo.duckdb
       - PYTHONLEGACYWINDOWSSTDIO=1
+      - DISABLE_CSV_SENSOR=true
     volumes:
-      # Volume pour persister les métadonnées de Dagster (historique, scheduler)
       - dagster_storage:/opt/dagster/dagster_home
-      
-      # Volume pour persister les données DuckDB sur ton disque local
       - ./data:/app/data
-      
-      # Bind-mount du code source pour permettre le hot-reload pendant le développement
       - .:/app
     restart: always
 
 volumes:
   dagster_storage:
     driver: local
-  # Note: Le dossier local 'data/' doit exister pour que le montage DuckDB fonctionne correctement.
