@@ -9,11 +9,9 @@ from pathlib import Path
 import logging
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 _env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(_env_path)
 
-# Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -25,14 +23,14 @@ class WeatherExtractor:
         """Initialize the extractor for Open-Meteo."""
         self.base_url: str = "https://archive-api.open-meteo.com/v1/archive"
         
-        # French cities coordinates with altitude and region as per roadmap
+        
         self.cities: Dict[str, Dict[str, Any]] = {
             "Paris": {"lat": 48.8566, "lon": 2.3522, "elevation": 35, "region": "Île-de-France"},
             "Lyon": {"lat": 45.7640, "lon": 4.8357, "elevation": 173, "region": "Auvergne-Rhône-Alpes"},
             "Marseille": {"lat": 43.2965, "lon": 5.3698, "elevation": 12, "region": "Provence-Alpes-Côte d'Azur"}
         }
         
-        # Mapping simple des codes WMO vers du texte
+        
         self.weather_codes = {
             0: "Ciel dégagé",
             1: "Principalement dégagé", 2: "Partiellement nuageux", 3: "Couvert",
@@ -99,7 +97,7 @@ class WeatherExtractor:
     def extract_all_cities(self, target_date: Optional[str] = None) -> List[Dict[str, Any]]:
         """Extract current weather data for all configured cities."""
         all_weather_data: List[Dict[str, Any]] = []
-        # Use a date in the past by default because Archive API has a 2-5 day delay
+        
         date_to_fetch = target_date or (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
         
         logger.info(f"Starting weather data extraction for {date_to_fetch}...")
@@ -133,7 +131,7 @@ class WeatherExtractor:
         """Save weather data to CSV file."""
         try:
             path = Path(filepath)
-            # Ensure directory exists
+          
             path.parent.mkdir(parents=True, exist_ok=True)
             
             df.to_csv(path, index=False, encoding='utf-8')
@@ -146,29 +144,29 @@ class WeatherExtractor:
 
 def main():
     """Main function for testing the extractor."""
-    # Note: Open-Meteo Archive API doesn't require an API key
+   
     
-    # Initialize extractor
+    
     extractor = WeatherExtractor()
     
-    # Extract data
+    
     weather_data = extractor.extract_all_cities()
     
     if weather_data:
-        # Convert to DataFrame
+        
         df = extractor.to_dataframe(weather_data)
         
-        # Save data
+       
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # Define path to data directory using pathlib
+        
         project_root = Path(__file__).resolve().parent.parent
         data_dir = project_root / "data"
         filepath = data_dir / f"weather_data_{timestamp}.csv"
         
         extractor.save_to_csv(df, str(filepath))
         
-        # Display summary
+        
         print("\n=== Weather Data Summary ===")
         print(f"Records extracted: {len(df)}")
         print(f"Cities: {', '.join(df['city'].unique())}")

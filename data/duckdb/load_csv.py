@@ -25,8 +25,7 @@ def load_csv_to_duckdb(target_date: Optional[str] = None) -> Dict[str, Any]:
         print(f"Connected to local DuckDB: {db_path}")
     except Exception as e:
         return {"error": f"DuckDB connection failed: {e}"}
-
-    # Créer les tables si elles n'existent pas
+    
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dim_cities (
             city_id INTEGER PRIMARY KEY,
@@ -69,7 +68,6 @@ def load_csv_to_duckdb(target_date: Optional[str] = None) -> Dict[str, Any]:
     city_mapping = conn.execute("SELECT city_id, city_name FROM dim_cities").fetchall()
     city_dict: Dict[str, int] = {name: city_id for city_id, name in city_mapping}
 
-    # Trouver les fichiers CSV
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     data_dir = os.path.join(project_root, 'data')
 

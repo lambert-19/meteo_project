@@ -1,7 +1,6 @@
 import pytest
 
 
-# ─── Tests de détection d'anomalies ─────────────────────────
 
 class TestAnomaliesTemperature:
 
@@ -20,9 +19,7 @@ class TestAnomaliesTemperature:
     def test_temperature_nulle_suspecte(self):
         """Une temp_max exactement à 0.0 en été est suspecte (capteur HS?)."""
         record = {"city": "Marseille", "date": "2026-07-15", "temp_max": 0.0, "temp_min": 0.0}
-        # On vérifie juste que temp_max != temp_min n'est pas forcément vrai ici
-        # Ce test sert à documenter le risque
-        assert record["temp_max"] == record["temp_min"]  # alerte si égaux
+        assert record["temp_max"] == record["temp_min"]  
 
     @pytest.mark.xfail(reason="Test de détection : un écart > 40°C doit être signalé")
     def test_ecart_temp_anormal(self):
@@ -39,7 +36,6 @@ class TestBatchDonnees:
         nb_villes = 3
         nb_jours = 30
         expected = nb_villes * nb_jours
-        # Simulation d'un batch fictif
         fake_batch = [{"city": "Paris"} for _ in range(expected)]
         assert len(fake_batch) == 90
 
@@ -48,7 +44,7 @@ class TestBatchDonnees:
         records = [
             {"city": "Paris", "date": "2026-04-01"},
             {"city": "Lyon", "date": "2026-04-01"},
-            {"city": "Paris", "date": "2026-04-01"},  # doublon !
+            {"city": "Paris", "date": "2026-04-01"},  
         ]
         paires = [(r["city"], r["date"]) for r in records]
         assert len(paires) != len(set(paires)), "Doublon détecté (comportement attendu dans ce test)"

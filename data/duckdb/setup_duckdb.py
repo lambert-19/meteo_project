@@ -8,7 +8,7 @@ from typing import List, Tuple
 
 def setup_database_simple():
     """Setup database with only necessary tables for Dagster pipeline."""
-    # Load environment variables
+
     load_dotenv("../../.env")
     motherduck_token = os.getenv("MOTHERDUCK_TOKEN")
 
@@ -16,7 +16,6 @@ def setup_database_simple():
         print("MOTHERDUCK_TOKEN environment variable not set")
         return
 
-    # Connect to MotherDuck
     try:
         conn = duckdb.connect(f'md:?motherduck_token={motherduck_token}')
         conn.execute("USE meteo_weather")
@@ -26,7 +25,6 @@ def setup_database_simple():
         return
 
     try:
-        # Create cities dimension table
         print("Creating dim_cities table...")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS dim_cities (
@@ -61,7 +59,6 @@ def setup_database_simple():
         """, cities_data)
         print(f"✓ Inserted {len(cities_data)} cities into dim_cities")
 
-        # Create calendar dimension table
         print("Creating dim_calendar table...")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS dim_calendar (
@@ -80,7 +77,6 @@ def setup_database_simple():
         """)
         print("✓ Created dim_calendar table")
 
-        # Populate calendar for current year
         current_year = datetime.now().year
         calendar_data: List[Tuple[int, date, int, int, int, int, int, int, int, bool, str]] = []
 
@@ -90,14 +86,12 @@ def setup_database_simple():
                     date_obj = date(current_year, month, day)
                     date_id = int(date_obj.strftime("%Y%m%d"))
 
-                    # Calculate additional fields
-                    day_of_week = date_obj.weekday() + 1  # Monday = 1
+                    day_of_week = date_obj.weekday() + 1  
                     day_of_year = date_obj.timetuple().tm_yday
                     week_of_year = (day_of_year - 1) // 7 + 1
                     quarter = (month - 1) // 3 + 1
-                    is_weekend = day_of_week >= 6  # Saturday = 6, Sunday = 7
+                    is_weekend = day_of_week >= 6  
 
-                    # Determine season (Northern Hemisphere)
                     if month in [12, 1, 2]:
                         season = "Winter"
                     elif month in [3, 4, 5]:
@@ -113,7 +107,6 @@ def setup_database_simple():
                         is_weekend, season
                     ))
                 except ValueError:
-                    # Invalid date (e.g., February 30)
                     continue
 
         conn.executemany("""
@@ -125,7 +118,6 @@ def setup_database_simple():
         """, calendar_data)
         print(f"✓ Inserted {len(calendar_data)} dates into dim_calendar")
 
-        # Create fact table for weather history
         print("Creating fct_weather_history table...")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS fct_weather_history (
@@ -149,7 +141,6 @@ def setup_database_simple():
         """)
         print("✓ Created fct_weather_history table")
 
-        # Verify setup
         print("\n=== Verification ===")
         res_city = conn.execute("SELECT COUNT(*) FROM dim_cities").fetchone()
         city_count = res_city[0] if res_city is not None else 0

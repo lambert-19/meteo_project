@@ -13,7 +13,7 @@ def validate_record(record: dict) -> WeatherRecord | None:
     try:
         return WeatherRecord(**record)
     except ValidationError as e:
-        logger.warning(f"❌ Enregistrement invalide ignoré : {e}")
+        logger.warning(f" Enregistrement invalide ignoré : {e}")
         return None
 
 
@@ -32,5 +32,5 @@ def validate_batch(records: list[dict]) -> list[WeatherRecord]:
         else:
             invalid_count += 1
 
-    logger.info(f"✅ {len(valid)} enregistrements valides / ❌ {invalid_count} rejetés")
+    logger.info(f" {len(valid)} enregistrements valides /  {invalid_count} rejetés")
     return valid

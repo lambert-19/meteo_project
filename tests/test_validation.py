@@ -3,9 +3,6 @@ from datetime import date
 from pydantic import ValidationError
 from validation.schemas import WeatherRecord, WeatherBatch
 
-
-# ─── Tests WeatherRecord ─────────────────────────────────────
-
 class TestWeatherRecord:
 
     def valid_data(self):
@@ -54,9 +51,6 @@ class TestWeatherRecord:
         with pytest.raises(ValidationError):
             WeatherRecord(**data)
 
-
-# ─── Tests WeatherBatch ──────────────────────────────────────
-
 class TestWeatherBatch:
 
     def valid_records(self):
@@ -83,6 +77,6 @@ class TestWeatherBatch:
 
     def test_doublons_detectes(self):
         records = self.valid_records()
-        records.append(records[0])  # doublon Paris / même date
+        records.append(records[0])  
         with pytest.raises(ValidationError):
             WeatherBatch(records=records)

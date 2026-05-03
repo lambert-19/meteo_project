@@ -12,7 +12,6 @@ from dashboard.charts import (
     chart_comparaison_moyennes,
 )
 
-# ─── Configuration de la page ────────────────────────────────
 
 st.set_page_config(
     page_title="Météo Dashboard",
@@ -20,7 +19,6 @@ st.set_page_config(
     layout="wide",
 )
 
-# ─── Chargement des données ──────────────────────────────────
 
 @st.cache_data
 def load_data():
@@ -50,7 +48,6 @@ def load_data():
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values("date")
 
-# Renommage si colonnes différentes
     rename_map = {
         "temperature": "temp_avg",
         "temperature_2m_max": "temp_max",
@@ -58,7 +55,6 @@ def load_data():
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    # Forcer les colonnes numériques
     for col in ["temp_max", "temp_min", "precipitation_sum"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -92,8 +88,6 @@ def donnees_fictives():
 
     return pd.DataFrame(records)
 
-
-# ─── Interface ───────────────────────────────────────────────
 
 st.title("🌤️ Dashboard Météo — Paris, Lyon, Marseille")
 st.markdown("Pipeline ELT automatisée • Open-Meteo API • Dagster + DuckDB + dbt")
@@ -132,7 +126,6 @@ with st.sidebar:
     st.markdown("**API :** Open-Meteo Historical")
     st.markdown("**Stack :** Dagster · DuckDB · dbt")
 
-# ─── Filtrage ────────────────────────────────────────────────
 
 df_filtered = df[df["city"].isin(villes_select)]
 if len(periode) == 2:
@@ -141,7 +134,6 @@ if len(periode) == 2:
         (df_filtered["date"].dt.date <= periode[1])
     ]
 
-# ─── KPIs ────────────────────────────────────────────────────
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -157,8 +149,6 @@ with col4:
 
 st.divider()
 
-# ─── Graphiques ──────────────────────────────────────────────
-
 st.plotly_chart(chart_temperatures(df_filtered), use_container_width=True)
 
 col_left, col_right = st.columns(2)
@@ -168,8 +158,6 @@ with col_right:
     st.plotly_chart(chart_amplitude_thermique(df_filtered), use_container_width=True)
 
 st.plotly_chart(chart_comparaison_moyennes(df_filtered), use_container_width=True)
-
-# ─── Données brutes ──────────────────────────────────────────
 
 with st.expander("🔍 Voir les données brutes"):
     st.dataframe(df_filtered.sort_values(["city", "date"]), use_container_width=True)
