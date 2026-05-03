@@ -62,7 +62,6 @@ class JobConfig(BaseModel):
     class Config:
         extra = "allow"
 
-# Default configurations
 DEFAULT_EXTRACTION_CONFIG = WeatherExtractionConfig(
     cities=["Paris", "Lyon", "Marseille"],
     source="scheduled_run"
@@ -82,7 +81,6 @@ DEFAULT_SCHEDULE_CONFIG = ScheduleConfig(
     }
 )
 
-# Job configurations
 WEATHER_JOB_CONFIG = JobConfig(
     name="weather_pipeline_job",
     description="Complete weather data ELT pipeline",
@@ -100,29 +98,28 @@ WEATHER_JOB_CONFIG = JobConfig(
     }
 )
 
-# Schedule configurations
+
 DAILY_SCHEDULE_CONFIG = {
-    "cron_schedule": "0 6 * * *",  # Every day at 6:00 AM
+    "cron_schedule": "0 6 * * *", 
     "description": "Daily weather data extraction and loading",
     "execution_timezone": "Europe/Paris",
     "default_status": "RUNNING"
 }
 
 HOURLY_SCHEDULE_CONFIG = {
-    "cron_schedule": "0 * * * *",  # Every hour at minute 0
+    "cron_schedule": "0 * * * *", 
     "description": "Hourly weather data extraction (for testing)",
     "execution_timezone": "Europe/Paris",
     "default_status": "STOPPED"
 }
 
 WEEKLY_SCHEDULE_CONFIG = {
-    "cron_schedule": "0 2 * * 1",  # Every Monday at 2:00 AM
+    "cron_schedule": "0 2 * * 1",  
     "description": "Weekly comprehensive weather data refresh",
     "execution_timezone": "Europe/Paris",
     "default_status": "STOPPED"
 }
 
-# Environment-specific configurations
 ENVIRONMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
     "development": {
         "schedules_enabled": False,
@@ -163,12 +160,10 @@ def resolve_config(config: Dict[str, Any], environment: str = "production") -> D
     env_config = get_environment_config(environment)
     resolved_config = config.copy()
     
-    # Apply environment-specific overrides
     for key, value in env_config.items():
         if key not in resolved_config:
             resolved_config[key] = value
-    
-    # Resolve environment variables
+
     def resolve_env_vars(obj: Any) -> Any:
         if isinstance(obj, dict):
             return {k: resolve_env_vars(v) for k, v in cast(Dict[Any, Any], obj).items()}

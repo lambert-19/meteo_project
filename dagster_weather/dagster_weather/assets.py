@@ -7,7 +7,6 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 
-# Add project root to path for proper imports
 _project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
@@ -23,11 +22,9 @@ from dagster import (
 )
 from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator, DbtProject
 
-# Import from project-level modules
 from extract import WeatherExtractor
 from data import load_csv_to_duckdb
 
-# Configuration du projet dbt
 DBT_PROJECT_DIR = Path(_project_root) / "dbt_meteo"
 dbt_project = DbtProject(project_dir=os.fspath(DBT_PROJECT_DIR))
 dbt_project.prepare_if_dev()
@@ -36,12 +33,10 @@ class MeteoDbtTranslator(DagsterDbtTranslator):
     def get_asset_key(self, dbt_resource_props: Mapping[str, Any]) -> AssetKey:
         resource_type = dbt_resource_props["resource_type"]
         name = dbt_resource_props["name"]
-        # Lie la source dbt fct_weather_history à l'asset Dagster load_weather_to_duckdb
         if resource_type == "source" and name == "fct_weather_history":
             return AssetKey("load_weather_to_duckdb")
         return super().get_asset_key(dbt_resource_props)
 
-# Définition d'une partition quotidienne
 daily_partition = DailyPartitionsDefinition(
     start_date="2024-01-01"
 )
@@ -72,7 +67,6 @@ def raw_weather_data(context: AssetExecutionContext, config: RawWeatherDataConfi
     weather_data: Any = extractor.extract_all_cities(target_date=target_date)
     df: pd.DataFrame = extractor.to_dataframe(weather_data)
     
-    # Sauvegarde effective du CSV pour que l'asset de chargement puisse le trouver
     date_clean = partition_date.replace("-", "")
     timestamp = f"{date_clean}_{datetime.now().strftime('%H%M%S')}"
     data_dir = Path(_project_root) / "data"
@@ -112,10 +106,8 @@ def load_weather_to_duckdb(context: AssetExecutionContext) -> MaterializeResult[
     partition_date = context.partition_key
     context.log.info(f"Starting weather data loading to DuckDB for partition: {partition_date}...")
     
-    # Use the imported CSV loading function
     result: dict[str, Any] = load_csv_to_duckdb(target_date=partition_date)
-    
-    # Convert result to Dagster MaterializeResult
+
     if "error" in result:
         context.log.error(f"Error: {result['error']}")
         return MaterializeResult(metadata=result)
@@ -132,6 +124,4 @@ def load_weather_to_duckdb(context: AssetExecutionContext) -> MaterializeResult[
 )
 def dbt_meteo_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iterator[Any]:
     """Exécute les transformations dbt (staging et marts)."""
-    # We use cast(Any, ...) on the invocation to resolve Pylance "reportUnknownMemberType" warnings 
-    # originating from Output[Unknown] in the stream() method signature in dagster-dbt stubs.
     yield from cast(Any, dbt.cli(["build"], context=context)).stream()

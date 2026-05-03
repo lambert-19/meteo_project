@@ -4,7 +4,6 @@ from dagster import ScheduleEvaluationContext
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-# Default run configurations
 DEFAULT_RUN_CONFIG: Dict[str, Any] = {
     "execution": {
         "config": {
@@ -21,7 +20,6 @@ DEFAULT_RUN_CONFIG: Dict[str, Any] = {
     }
 }
 
-# Extraction-specific run configuration
 def get_extraction_run_config(
     cities: Optional[list[str]] = None,
     batch_id: Optional[str] = None,
@@ -46,8 +44,6 @@ def get_extraction_run_config(
     }
     
     return config
-
-# Loading-specific run configuration
 def get_loading_run_config(
     target: str = "motherduck",
     batch_id: Optional[str] = None,
@@ -107,12 +103,11 @@ def get_pipeline_run_config(
     
     return config
 
-# Environment-based run configurations
 def get_development_run_config() -> Dict[str, Any]:
     """Get development environment run configuration."""
     
     return get_pipeline_run_config(
-        cities=["Paris"],  # Single city for faster testing
+        cities=["Paris"],  
         source="development",
         trigger="manual",
         backup_enabled=True
@@ -132,13 +127,12 @@ def get_testing_run_config() -> Dict[str, Any]:
     """Get testing environment run configuration."""
     
     return get_pipeline_run_config(
-        cities=["Paris"],  # Single city for testing
+        cities=["Paris"],  
         source="testing",
         trigger="test",
-        backup_enabled=False  # No backup for testing
+        backup_enabled=False  
     )
 
-# Schedule-specific run configurations
 def get_daily_schedule_run_config(context: ScheduleEvaluationContext) -> Dict[str, Any]:
     """Get run configuration for daily schedule."""
     
@@ -161,7 +155,7 @@ def get_hourly_schedule_run_config(context: ScheduleEvaluationContext) -> Dict[s
     batch_id = f"weather_hourly_{execution_date}_{context.scheduled_execution_time.hour}"
     
     return get_pipeline_run_config(
-        cities=["Paris"],  # Single city for hourly runs
+        cities=["Paris"], 
         batch_id=batch_id,
         execution_date=execution_date,
         source="hourly_schedule",
@@ -169,7 +163,6 @@ def get_hourly_schedule_run_config(context: ScheduleEvaluationContext) -> Dict[s
         backup_enabled=True
     )
 
-# Sensor-triggered run configurations
 def get_csv_sensor_run_config(file_name: str, timestamp: str) -> Dict[str, Any]:
     """Get run configuration for CSV file sensor trigger."""
     
@@ -200,7 +193,6 @@ def get_api_sensor_run_config(hour: int) -> Dict[str, Any]:
         backup_enabled=True
     )
 
-# Manual trigger run configurations
 def get_manual_run_config(
     cities: Optional[list[str]] = None,
     custom_config: Optional[Dict[str, Any]] = None
@@ -219,7 +211,6 @@ def get_manual_run_config(
         backup_enabled=True
     )
     
-    # Apply custom configuration if provided
     if custom_config:
         for op_name, op_config in custom_config.items():
             if op_name in base_config["ops"]:
@@ -227,7 +218,6 @@ def get_manual_run_config(
     
     return base_config
 
-# Utility functions
 def validate_run_config(config: Dict[str, Any]) -> bool:
     """Validate run configuration."""
     
@@ -235,8 +225,7 @@ def validate_run_config(config: Dict[str, Any]) -> bool:
     for key in required_keys:
         if key not in config:
             return False
-    
-    # Check if raw_weather_data has required config
+ 
     if "raw_weather_data" not in config["ops"]:
         return False
     

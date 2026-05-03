@@ -3,20 +3,19 @@
 from typing import Any, List
 from datetime import timedelta
 from dagster import (
-    schedule,  # type: ignore
+    schedule,  
     ScheduleDefinition,
     DefaultScheduleStatus,
     RunRequest,
     AssetSelection,
-    define_asset_job,  # type: ignore
+    define_asset_job,  
     ScheduleEvaluationContext
 )
 
-# Define asset-based job for weather pipeline
 weather_job: Any = define_asset_job(
     name="weather_pipeline_job",
     description="Complete weather data ELT pipeline",
-    selection=AssetSelection.all(), # Select all assets
+    selection=AssetSelection.all(), 
 )
 
 @schedule(
@@ -36,28 +35,25 @@ def daily_weather_schedule(context: ScheduleEvaluationContext) -> RunRequest:
         run_key=f"daily_weather_delayed_{target_date}"
     )
 
-# Hourly schedule for testing (optional)
 hourly_weather_schedule = ScheduleDefinition(
     job=weather_job,
-    cron_schedule="0 * * * *",  # Every hour at minute 0
+    cron_schedule="0 * * * *", 
     description="Hourly weather data extraction (for testing)",
-    default_status=DefaultScheduleStatus.STOPPED,  # Disabled by default
+    default_status=DefaultScheduleStatus.STOPPED,  
     execution_timezone="Europe/Paris"
 )
 
-# Weekly schedule for comprehensive data refresh
 weekly_weather_schedule = ScheduleDefinition(
     job=weather_job,
-    cron_schedule="0 2 * * 1",  # Every Monday at 2:00 AM
+    cron_schedule="0 2 * * 1", 
     description="Weekly comprehensive weather data refresh",
-    default_status=DefaultScheduleStatus.STOPPED,  # Disabled by default
+    default_status=DefaultScheduleStatus.STOPPED,  
     execution_timezone="Europe/Paris"
 )
 
-# Custom schedule with context for dynamic execution
 @schedule(
     job=weather_job,
-    cron_schedule="*/2 * * * *",  # Every 2 minutes for testing
+    cron_schedule="*/2 * * * *", 
     description="Weather pipeline with dynamic context (testing - every 2 minutes)",
     execution_timezone="Europe/Paris"
 )
@@ -90,12 +86,10 @@ def daily_weather_with_context(context: ScheduleEvaluationContext) -> RunRequest
         tags={"date": date_str, "schedule": "daily"}
     )
 
-# All schedules to be registered (simplified for testing)
 all_schedules: List[Any] = [
     daily_weather_schedule
 ]
 
-# All jobs to be registered
 all_jobs: List[Any] = [
     weather_job
 ]
