@@ -130,7 +130,13 @@ def dbt_meteo_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Ite
     key="streamlit_dashboard",
     description="Dashboard Streamlit de visualisation météo",
     compute_kind="streamlit",
-    deps=[AssetKey("stg_weather_history")],
+    deps=[
+        AssetKey("mart_city_frost_days"),
+        AssetKey("mart_city_heatwaves"),
+        AssetKey("mart_city_thermal_amplitude"),
+        AssetKey("mart_city_weather_records"),
+        AssetKey("mart_regional_precipitation_comparison"),
+    ],
 )
 def streamlit_dashboard(context: AssetExecutionContext) -> MaterializeResult:
     """Lance le dashboard Streamlit et vérifie que les données sont disponibles."""
