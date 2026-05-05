@@ -6,6 +6,7 @@ services:
     container_name: meteo_dagster_app
     ports:
       - "3000:3000"
+      - "8501:8501"
     environment:
       - DAGSTER_HOME=/opt/dagster/dagster_home
       - METEO_DATABASE_PATH=/app/data/meteo.duckdb

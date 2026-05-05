@@ -125,3 +125,47 @@ def load_weather_to_duckdb(context: AssetExecutionContext) -> MaterializeResult[
 def dbt_meteo_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iterator[Any]:
     """Exécute les transformations dbt (staging et marts)."""
     yield from cast(Any, dbt.cli(["build"], context=context)).stream()
+
+@asset(
+    key="streamlit_dashboard",
+    description="Dashboard Streamlit de visualisation météo",
+    compute_kind="streamlit",
+    deps=[AssetKey("stg_weather_history")],
+)
+def streamlit_dashboard(context: AssetExecutionContext) -> MaterializeResult:
+    """Lance le dashboard Streamlit et vérifie que les données sont disponibles."""
+    
+    import subprocess
+    import sys
+    
+    data_dir = Path(_project_root) / "data"
+    csv_files = list(data_dir.glob("weather_data_*.csv"))
+    
+    if not csv_files:
+        context.log.warning("Aucun fichier CSV trouvé pour le dashboard.")
+        return MaterializeResult(metadata={"status": "no data"})
+    
+    latest_csv = max(csv_files, key=lambda f: f.stat().st_mtime)
+    
+    dashboard_path = Path(_project_root) / "dashboard" / "app.py"
+    
+    try:
+        subprocess.Popen(
+            [sys.executable, "-m", "streamlit", "run", str(dashboard_path),
+             "--server.port", "8501",
+             "--server.headless", "true"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        context.log.info("Dashboard Streamlit démarré sur http://localhost:8501")
+    except Exception as e:
+        context.log.warning(f"Streamlit déjà en cours ou erreur : {e}")
+    
+    return MaterializeResult(
+        metadata={
+            "url": MetadataValue.url("http://localhost:8501"),
+            "latest_data_file": MetadataValue.text(latest_csv.name),
+            "csv_files_count": MetadataValue.int(len(csv_files)),
+            "status": MetadataValue.text("Dashboard opérationnel"),
+        }
+    )

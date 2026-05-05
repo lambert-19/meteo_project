@@ -24,6 +24,11 @@ import re
 def csv_file_sensor(context: SensorEvaluationContext):
     """Sensor that triggers the weather pipeline when new CSV files are detected."""
     
+    import os
+    if os.getenv("DISABLE_CSV_SENSOR", "false").lower() == "true":
+        context.log.info("CSV sensor disabled via DISABLE_CSV_SENSOR env var.")
+        return SensorResult(cursor=context.cursor)
+    
     data_dir = Path(__file__).resolve().parent.parent.parent / "data"
     
     if not data_dir.exists():
@@ -90,12 +95,12 @@ def csv_file_sensor(context: SensorEvaluationContext):
 def api_rate_limit_sensor(context: SensorEvaluationContext):
     """Sensor that triggers the pipeline based on API rate limits and optimal conditions."""
     
+    import os
+    if os.getenv("DISABLE_CSV_SENSOR", "false").lower() == "true":
+        context.log.info("API rate limit sensor disabled in Docker mode.")
+        return SensorResult(cursor=context.cursor)
+    
     current_time = datetime.now(timezone.utc)
-    current_hour = current_time.hour
-    
-    optimal_hours = [6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20]
-    
-    last_run_time = float(context.cursor) if context.cursor else 0.0
     
     if current_hour in optimal_hours:
         time_since_last_run = current_time.timestamp() - last_run_time
