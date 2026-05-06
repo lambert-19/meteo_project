@@ -22,7 +22,7 @@ st.set_page_config(
 
 @st.cache_data
 def load_data():
-    """Charge les données depuis DuckDB (modèles dbt)."""
+    """Charge les données depuis DuckDB."""
     db_path = os.path.join(os.path.dirname(__file__), "..", "data", "meteo.duckdb")
 
     if not os.path.exists(db_path):
@@ -32,14 +32,14 @@ def load_data():
         conn = duckdb.connect(db_path, read_only=True)
         df = conn.execute("""
             SELECT
-                city_name   AS city,
-                observed_at AS date,
-                temperature_max  AS temp_max,
-                temperature_min  AS temp_min,
-                precipitation_mm AS precipitation_sum
-            FROM stg_weather_history
-            WHERE city_name IS NOT NULL
-            ORDER BY observed_at
+                c.city_name   AS city,
+                f.timestamp   AS date,
+                f.temp_max    AS temp_max,
+                f.temp_min    AS temp_min,
+                f.precipitation_sum AS precipitation_sum
+            FROM fct_weather_history f
+            JOIN dim_cities c ON f.city_id = c.city_id
+            ORDER BY f.timestamp
         """).df()
         conn.close()
 
